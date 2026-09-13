@@ -1,0 +1,304 @@
+/* ---------------------------------------------
+   Tokens (shadcn-style, black & white)
+---------------------------------------------- */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --muted: 0 0% 97%;
+  --muted-foreground: 0 0% 46%;
+  --border: 0 0% 89%;
+  --input: 0 0% 87%;
+  --ring: 0 0% 9%;
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 100%;
+  --destructive: 0 72% 42%;
+  --destructive-bg: 0 72% 97%;
+
+  --radius: 0.625rem;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.12), 0 2px 8px -2px rgb(0 0 0 / 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------
+   Layout
+---------------------------------------------- */
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.25rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 32rem;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) + 8px);
+  box-shadow: var(--shadow-md);
+  padding: 2.25rem 2rem;
+}
+
+.card-header {
+  margin-bottom: 1.75rem;
+  text-align: right;
+}
+
+.card-header h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: hsl(var(--card-foreground));
+  letter-spacing: -0.01em;
+}
+
+.card-header p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: hsl(var(--muted-foreground));
+  font-weight: 400;
+}
+
+/* ---------------------------------------------
+   Sections
+---------------------------------------------- */
+.section {
+  padding-top: 1.5rem;
+  border-top: 1px solid hsl(var(--border));
+  margin-top: 1.5rem;
+}
+
+.section:first-of-type {
+  padding-top: 0;
+  border-top: none;
+  margin-top: 0;
+}
+
+.section-title {
+  margin: 0 0 1.1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: hsl(var(--muted-foreground));
+  text-align: right;
+}
+
+/* ---------------------------------------------
+   Fields
+---------------------------------------------- */
+.field {
+  margin-bottom: 1.1rem;
+  width: 100%;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field-row {
+  display: flex;
+  gap: 0.9rem;
+}
+
+.field-row .field {
+  flex: 1;
+  min-width: 0;
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: hsl(var(--card-foreground));
+  margin-bottom: 0.45rem;
+  text-align: right;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+select {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 0.9rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--input));
+  border-radius: var(--radius);
+  outline: none;
+  text-align: right;
+  direction: rtl;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input::placeholder {
+  color: hsl(var(--muted-foreground));
+  font-weight: 400;
+}
+
+input:focus-visible,
+select:focus-visible {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.12);
+}
+
+/* Phone: keep digit entry natural but text sits on the right */
+input[type="tel"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Number input: hide native spinners for a cleaner look */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Select */
+.select-wrap {
+  position: relative;
+}
+
+select {
+  cursor: pointer;
+  padding-left: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23767676' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.85rem center;
+}
+
+/* Date input */
+input[type="date"] {
+  text-align: right;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+/* ---------------------------------------------
+   Validation states
+---------------------------------------------- */
+.error-msg {
+  display: block;
+  min-height: 1.1rem;
+  margin-top: 0.35rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: hsl(var(--destructive));
+  text-align: right;
+}
+
+input.invalid,
+select.invalid {
+  border-color: hsl(var(--destructive));
+  background: hsl(var(--destructive-bg));
+}
+
+input.invalid:focus-visible,
+select.invalid:focus-visible {
+  box-shadow: 0 0 0 3px hsl(var(--destructive) / 0.14);
+}
+
+.form-summary {
+  margin: 0.25rem 0 1.25rem;
+  padding: 0.7rem 0.9rem;
+  background: hsl(var(--destructive-bg));
+  border: 1px solid hsl(var(--destructive) / 0.25);
+  border-radius: var(--radius);
+  color: hsl(var(--destructive));
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ---------------------------------------------
+   Submit button
+---------------------------------------------- */
+.submit-btn {
+  width: 100%;
+  height: 2.85rem;
+  border: none;
+  border-radius: var(--radius);
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1.75rem;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+
+.submit-btn:hover {
+  opacity: 0.88;
+}
+
+.submit-btn:active {
+  transform: scale(0.99);
+}
+
+.submit-btn:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---------------------------------------------
+   Responsive
+---------------------------------------------- */
+@media (max-width: 480px) {
+  .card {
+    padding: 1.6rem 1.35rem;
+    border-radius: var(--radius);
+  }
+
+  .card-header h1 {
+    font-size: 1.15rem;
+  }
+
+  .field-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

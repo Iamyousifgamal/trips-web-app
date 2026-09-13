@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل بيانات الرحلة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="page">
+    <form class="card" id="trip-form" novalidate>
+
+      <header class="card-header">
+        <h1>تسجيل بيانات الرحلة</h1>
+        <p>أدخل بيانات الراكب والرحلة لإتمام التسجيل</p>
+      </header>
+
+      <section class="section">
+        <h2 class="section-title">بيانات الراكب</h2>
+
+        <div class="field">
+          <label for="full-name">الاسم</label>
+          <input type="text" id="full-name" name="fullName" placeholder="الاسم بالكامل" autocomplete="name">
+          <span class="error-msg" id="err-fullName"></span>
+        </div>
+
+        <div class="field">
+          <label for="phone">رقم التليفون</label>
+          <input type="tel" id="phone" name="phone" placeholder="01xxxxxxxxx" autocomplete="tel" inputmode="numeric" maxlength="11">
+          <span class="error-msg" id="err-phone"></span>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">بيانات الرحلة</h2>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="from">من</label>
+            <input type="text" id="from" name="from" placeholder="نقطة البداية" autocomplete="off">
+            <span class="error-msg" id="err-from"></span>
+          </div>
+
+          <div class="field">
+            <label for="to">إلى</label>
+            <input type="text" id="to" name="to" placeholder="نقطة النهاية" autocomplete="off">
+            <span class="error-msg" id="err-to"></span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="transport">نوع المواصلة</label>
+          <div class="select-wrap">
+            <select id="transport" name="transport">
+              <option value="microbus" selected>ميكروباص</option>
+              <option value="taxi">تاكسي</option>
+              <option value="bus">أتوبيس</option>
+              <option value="metro">مترو</option>
+              <option value="other">أخرى</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="trip-date">تاريخ الرحلة</label>
+            <input type="date" id="trip-date" name="tripDate">
+            <span class="error-msg" id="err-tripDate"></span>
+          </div>
+
+          <div class="field">
+            <label for="cost">التكلفة (جنيه)</label>
+            <input type="number" id="cost" name="cost" placeholder="75.00" step="0.01" min="0" inputmode="decimal">
+            <span class="error-msg" id="err-cost"></span>
+          </div>
+        </div>
+      </section>
+
+      <div class="form-summary" id="form-summary" role="alert" hidden></div>
+
+      <button type="submit" class="submit-btn">تسجيل بيانات الرحلة</button>
+
+    </form>
+  </main>
+<script>
+
+  const SUPABASE_URL = 'https://sdbvevefxziyhzqzilrv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkYnZldmVmeHppeWh6cXppbHJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMjk0NjUsImV4cCI6MjEwNDkwNTQ2NX0.ugU0hZIdZmXYQXxdxGBSXJ8qy-EKBJ2pckemh8Yx7zg'
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const form = document.getElementById('trip-form');
+  const summary = document.getElementById('form-summary');
+
+  document.getElementById('trip-date').valueAsDate = new Date();
+
+  function validateForm(data) {
+    const errors = [];
+
+    if (!data.fullName || data.fullName.length < 3)
+      errors.push({ field: "fullName", message: "الاسم قصير جداً" });
+
+    if (!/^01[0-2,5]\d{8}$/.test(data.phone))
+      errors.push({ field: "phone", message: "رقم التليفون غير صحيح" });
+
+    if (!data.from || data.from.length < 2)
+      errors.push({ field: "from", message: "اكتب نقطة البداية" });
+
+    if (!data.to || data.to.length < 2)
+      errors.push({ field: "to", message: "اكتب نقطة النهاية" });
+
+    if (!data.cost || data.cost <= 0 || data.cost > 10000)
+      errors.push({ field: "cost", message: "التكلفة غير منطقية" });
+
+    if (!data.tripDate)
+      errors.push({ field: "tripDate", message: "اختر تاريخ الرحلة" });
+
+    return errors;
+  }
+
+  function clearErrors() {
+    form.querySelectorAll('.error-msg').forEach(el => el.textContent = '');
+    form.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    summary.hidden = true;
+    summary.textContent = '';
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearErrors();
+
+    const raw = Object.fromEntries(new FormData(form).entries());
+
+    const validationData = {
+      fullName: raw.fullName?.trim() || '',
+      phone: raw.phone?.trim() || '',
+      from: raw.from?.trim() || '',
+      to: raw.to?.trim() || '',
+      cost: parseFloat(raw.cost),
+      tripDate: raw.tripDate
+    };
+
+    const errors = validateForm(validationData);
+
+    if (errors.length) {
+      errors.forEach(({ field, message }) => {
+        const errEl = document.getElementById('err-' + field);
+        const inputEl = form.elements[field];
+        if (errEl) errEl.textContent = message;
+        if (inputEl) inputEl.classList.add('invalid');
+      });
+      summary.hidden = false;
+      summary.textContent = `يوجد ${errors.length} ${errors.length === 1 ? 'خطأ' : 'أخطاء'} يجب تصحيحها قبل الإرسال`;
+      form.querySelector('.invalid')?.focus();
+      return;
+    }
+
+    const dbData = {
+      full_name: validationData.fullName,
+      phone: validationData.phone,
+      from_location: validationData.from,
+      to_location: validationData.to,
+      transport_type: raw.transport,
+      cost: validationData.cost,
+      trip_date: validationData.tripDate
+    };
+
+    const btn = form.querySelector('.submit-btn');
+    const original = btn.textContent;
+    btn.textContent = 'جاري التسجيل...';
+    btn.disabled = true;
+
+    const { error } = await supabaseClient.from('trips').insert(dbData);
+
+    if (error) {
+      console.error('Supabase error:', error);
+      summary.hidden = false;
+      summary.textContent = 'حدث خطأ أثناء الحفظ: ' + error.message;
+      btn.textContent = original;
+      btn.disabled = false;
+      return;
+    }
+
+    btn.textContent = 'تم التسجيل ✓';
+    form.reset();
+    document.getElementById('trip-date').valueAsDate = new Date();
+
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.disabled = false;
+    }, 1600);
+  });
+
+  form.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', () => {
+      el.classList.remove('invalid');
+      const errEl = document.getElementById('err-' + el.name);
+      if (errEl) errEl.textContent = '';
+    });
+  });
+</script>
+</body>
+</html>
