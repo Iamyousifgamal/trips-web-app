@@ -301,8 +301,8 @@ select.invalid:focus-visible {
   * {
     transition: none !important;
   }
+}
 
 p {
   text-align: center;
 }
-
